@@ -8,49 +8,6 @@
 #include "proc.h"
 
 int
-sys_lseek(void)
-{
-	struct file * fp;
-	int fd, x, ex, res;
-	signed int offset, newoff;
-	char * pt;
-
-	newoff = 0;
-
-	argfd(0, &fd, &fp);
-	argint(1, &offset);
-	argint(2, &x);
-
-	if(x == SEEK_SET){
-		newoff = offset;
-		fp->off = newoff;
-	}
-
-	else if(x == SEEK_CUR){
-		newoff = fp->off + offset;
-		fp->off = newoff;
-	}
-
-	else if(x == SEEK_END){
-		newoff = fp->ip->size + offset;
-	}
-
-	if(fp->ip->size < newoff){
-		ex = newoff - fp->ip->size;
-		pt = kalloc();
-		while(ex > 0){
-			filewrite(fp, pt, ex);
-			ex = ex - 4096;
-		}
-		kfree(pt);
-	}
-
-	fp->off = newoff;
-	res = fp->off;
-	return res;
-}
-
-int
 sys_fork(void)
 {
   return fork();
